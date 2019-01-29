@@ -20,7 +20,9 @@ class Users(db.Model):
 
 
         def __repr__(self):
-            return '<User %r>' % self.email_address
+            return {
+                'email_address': self.email_address
+            }
 
 @app.route('/')
 def hello_world():
@@ -55,7 +57,10 @@ def fetch():
 
     #logging
     logging.info('done')
-    return len(str(x))
+    logging.info(str(len(x)))
+
+
+    return f'Records:=> {str(len(x))}'
 
     
     
