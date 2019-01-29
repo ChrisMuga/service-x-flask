@@ -5,7 +5,11 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    return render_template('home.html')
+    data = {
+        'name': 'Chris Muga',
+        'age': 24
+    }
+    return render_template('home.html', data = data)
 @app.route('/login')
 def login():
     return 'Login Here...'
