@@ -9,7 +9,7 @@ def hello_world():
         'name': 'Chris Muga',
         'age': 24
     }
-    return render_template('home.html', data = data)
+    return render_template('index.html', data = data)
 @app.route('/login')
 def login():
     return 'Login Here...'
