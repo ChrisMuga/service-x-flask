@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 
 from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import IntegrityError, DBAPIError, OperationalError, InternalError
 # marshmallow for serializing sqlalchemy data
 from flask_marshmallow import Marshmallow
 
@@ -39,10 +40,10 @@ class UsersSchema(ma.ModelSchema):
 #instantiate schemas
 
 #single record [one]
-user     = UsersSchema()
+user     = UsersSchema(strict = True)
 
 #multiple records [many]
-users    = UsersSchema(many=True)
+users    = UsersSchema(many=True, strict = True)
 
 @app.route('/')
 def hello_world():
@@ -60,16 +61,48 @@ def profile(id):
 
 @app.route('/connect')
 def connect():
+    try:
+        users = Users(
+                        id              =   '1253456', 
+                        first_name      =   'Tony', 
+                        last_name       =   'Momtana', 
+                        email_address   =   'tony@mail.com' 
+                    )
+        db.session.add(users)
+        db.session.commit()
+        return 'DB'
+    except IntegrityError:
+
+        response =  {
+                        'code'  :   0,
+                        'msg'   :   'Integrity Error'
+                    }
+
+    except DBAPIError:
+
+        response =  {
+                        'code'  :   0,
+                        'msg'   :   'DBAPIError'
+                    }
+
+    except OperationalError:
+
+        response =  {
+                        'code'  :   0,
+                        'msg'   :   'OperationalError'
+                    }
+
+    except InternalError:
+
+        response =  {
+                        'code'  :   0,
+                        'msg'   :   'InternalError'
+                    }
+    finally:
+
+        return jsonify(response)
+
     
-    users = Users(
-                    id              =   '1253456', 
-                    first_name      =   'Tony', 
-                    last_name       =   'Momtana', 
-                    email_address   =   'tony@mail.com' 
-                )
-    db.session.add(users)
-    db.session.commit()
-    return 'DB'
 
 @app.route('/fetch')
 def fetch():
