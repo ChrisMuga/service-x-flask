@@ -2,6 +2,8 @@ from flask import Flask, jsonify
 
 from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
+# marshmallow for serializing sqlalchemy data
+from flask_marshmallow import Marshmallow
 
 import logging
 import json
@@ -11,6 +13,10 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='postgresql://postgres:root@localhost/servicex'
 db = SQLAlchemy(app)
 
+# marshmallow after sql-alchemy
+ma = Marshmallow(app)
+
+#create sql-alchemy model.
 class Users(db.Model):
 
         id              = db.Column(db.Integer, primary_key=True)
@@ -23,6 +29,20 @@ class Users(db.Model):
             return {
                 'email_address': self.email_address
             }
+
+
+#create marshmallow schema (from sqlalchemy model)
+class UsersSchema(ma.ModelSchema):
+    class Meta:
+        model = Users
+
+#instantiate schemas
+
+#single record [one]
+user     = UsersSchema()
+
+#multiple records [many]
+users    = UsersSchema(many=True)
 
 @app.route('/')
 def hello_world():
@@ -53,14 +73,20 @@ def connect():
 
 @app.route('/fetch')
 def fetch():
+
+    #fetch all users
     x = Users.query.all()
 
-    #logging
-    logging.info('done')
-    logging.info(str(len(x)))
+    #parse dataset into an object [marshmallow]
+    result = users.dump(x)
+
+    #parse to json string
+    data = jsonify(result.data)
+    
+    #return values
+    return data
 
 
-    return f'Records:=> {str(len(x))}'
 
     
     
