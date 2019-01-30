@@ -2,9 +2,15 @@ from flask import Flask, jsonify
 
 from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
+
+#for error handling purposes
 from sqlalchemy.exc import IntegrityError, DBAPIError, OperationalError, InternalError
+
 # marshmallow for serializing sqlalchemy data
 from flask_marshmallow import Marshmallow
+
+# for API purposes
+from flask_restful import Resource, Api
 
 import logging
 import json
@@ -13,6 +19,8 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI']='postgresql://postgres:root@localhost/servicex'
 db = SQLAlchemy(app)
+
+api = Api(app)
 
 # marshmallow after sql-alchemy
 ma = Marshmallow(app)
@@ -118,6 +126,16 @@ def fetch():
     
     #return values
     return data
+
+
+class HelloWorld(Resource):
+    def get(self):
+        return  {
+                    'hello' : 'world',
+                    'msg'   : "your's is the world, and everything that's in it."
+                }
+
+api.add_resource(HelloWorld, '/hello')
 
 
 
